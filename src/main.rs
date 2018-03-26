@@ -53,8 +53,7 @@ const REQUEST_PACKET: &'static str = "\x1b\x00\x00\x00\x00\x00\x00\x00\
 // (70 * 365 + 17) * 86400 = 2208988800
 const UNIX_EPOCH_OFFSET: u32 = 2208988800;
 
-const BIND_ADDRESS: &'static str = "0.0.0.0:34254";
-// TODO: look for another available port if the default one is not
+const BIND_ADDRESS: &'static str = "0.0.0.0:0";
 
 const BUFFER_SIZE: usize = 1024;
 
