@@ -40,7 +40,7 @@ const TRANSMIT_TS_OFFSET: u64 = 40;
 // where: LI = 0; VN, Mode = 3
 // altogether: 000011011 -> 1b (base 16)
 // padding the rest with zeros
-const REQUEST_HEADER: &'static str = "\x1b\x00\x00\x00\x00\x00\x00\x00\
+const REQUEST_PACKET: &'static str = "\x1b\x00\x00\x00\x00\x00\x00\x00\
                                       \x00\x00\x00\x00\x00\x00\x00\x00\
                                       \x00\x00\x00\x00\x00\x00\x00\x00\
                                       \x00\x00\x00\x00\x00\x00\x00\x00\
@@ -67,7 +67,7 @@ fn receive_timestamp() -> u32 {
     let socket = UdpSocket::bind(BIND_ADDRESS).expect("couldn't bind to address");
     let ntp_address = format!("{}:{}", NTP_HOST, NTP_PORT);
 
-    socket.send_to(REQUEST_HEADER.as_bytes(), ntp_address).expect("couldn't send data");
+    socket.send_to(REQUEST_PACKET.as_bytes(), ntp_address).expect("couldn't send data");
     socket.recv_from(&mut buffer).expect("didn't receive data");
     // TODO: handle timeout
 
