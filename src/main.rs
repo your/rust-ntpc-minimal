@@ -3,6 +3,7 @@ extern crate byteorder;
 use byteorder::{BigEndian, ReadBytesExt};
 use std::io::Cursor;
 use std::net::UdpSocket;
+use std::time::Duration;
 
 // From page 18 of https://www.ietf.org/rfc/rfc5905.txt:
 //
@@ -60,14 +61,19 @@ const BUFFER_SIZE: usize = 1024;
 const NTP_PORT: u32 = 123;
 const NTP_HOST: &'static str = "pool.ntp.org";
 
+const SOCKET_TIMEOUT: u64 = 2500;
+
 fn receive_timestamp() -> u32 {
     let mut buffer = vec![0u8; BUFFER_SIZE];
     let socket = UdpSocket::bind(BIND_ADDRESS).expect("couldn't bind to address");
     let ntp_address = format!("{}:{}", NTP_HOST, NTP_PORT);
+    let socket_timeout = Some(Duration::from_millis(SOCKET_TIMEOUT));
+
+    socket.set_write_timeout(socket_timeout).expect("set_write_timeout call failed");
+    socket.set_read_timeout(socket_timeout).expect("set_read_timeout call failed");
 
     socket.send_to(REQUEST_PACKET.as_bytes(), ntp_address).expect("couldn't send data");
     socket.recv_from(&mut buffer).expect("didn't receive data");
-    // TODO: handle timeout
 
     let mut reader = Cursor::new(&buffer);
 
