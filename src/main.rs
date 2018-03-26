@@ -58,8 +58,7 @@ const BIND_ADDRESS: &'static str = "0.0.0.0:0";
 const BUFFER_SIZE: usize = 1024;
 
 const NTP_PORT: u32 = 123;
-const NTP_HOST: &'static str = "129.6.15.27"; // time-d-g.nist.gov
-// TODO: handle multiple targets
+const NTP_HOST: &'static str = "pool.ntp.org";
 
 fn receive_timestamp() -> u32 {
     let mut buffer = vec![0u8; BUFFER_SIZE];
