@@ -2,9 +2,17 @@
 
 Minimal NTP client, written in Rust.
 
+### Usage
+
+```
+rust-ntpc-minimal <NTP_HOST>
+```
+
+If no `NTP_HOST` is specified, `pool.ntp.org` will be used by default.
+
 ### Limitations
 
-It returns the **transmit** timestamp only, in seconds (_precision is cut off for now_), received from `pool.ntp.org`, and discards any other information in the datagram packet received from the NTP server, which, by the way, cannot be specified from the command line (_yet_).
+It returns the **transmit** timestamp only, in seconds (_precision is cut off for now_), and discards any other information contained in the UDP datagram packet received from the NTP server.
 
 ### _Shameless and prententious performance test:_
 

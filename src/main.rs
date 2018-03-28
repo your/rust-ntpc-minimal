@@ -1,6 +1,7 @@
 extern crate byteorder;
 
 use byteorder::{BigEndian, ReadBytesExt};
+use std::env;
 use std::io::Cursor;
 use std::net::UdpSocket;
 use std::time::Duration;
@@ -60,15 +61,15 @@ const BIND_ADDRESS: &'static str = "0.0.0.0:0";
 
 const BUFFER_SIZE: usize = 1024;
 
-const NTP_PORT: u32 = 123;
-const NTP_HOST: &'static str = "pool.ntp.org";
+const DEFAULT_NTP_PORT: u32 = 123;
+const DEFAULT_NTP_HOST: &'static str = "pool.ntp.org";
 
 const SOCKET_TIMEOUT: u64 = 2500;
 
-fn receive_timestamp() -> u32 {
+fn receive_timestamp(ntp_host: &str) -> u32 {
     let mut buffer = vec![0u8; BUFFER_SIZE];
     let socket = UdpSocket::bind(BIND_ADDRESS).expect("couldn't bind to address");
-    let ntp_address = format!("{}:{}", NTP_HOST, NTP_PORT);
+    let ntp_address = format!("{}:{}", ntp_host, DEFAULT_NTP_PORT);
     let socket_timeout = Some(Duration::from_millis(SOCKET_TIMEOUT));
 
     socket.set_write_timeout(socket_timeout).expect("set_write_timeout call failed");
@@ -85,16 +86,29 @@ fn receive_timestamp() -> u32 {
 }
 
 fn main() {
-    println!("{:?}", receive_timestamp());
+    let args: Vec<String> = env::args().collect();
+    let ntp_host = ntp_host_from_args(&args);
+
+    println!("{}", receive_timestamp(ntp_host));
+}
+
+fn ntp_host_from_args(args: &Vec<String>) -> &str {
+    let mut ntp_host: &str = &DEFAULT_NTP_HOST;
+
+    if args.len() >= 2 {
+        ntp_host = &args[1];
+    }
+
+    ntp_host
 }
 
 #[test]
 fn test() {
     use std::{thread, time};
 
-    let t1 = receive_timestamp();
+    let t1 = receive_timestamp("pool.ntp.org");
     thread::sleep(time::Duration::from_millis(1000));
-    let t2 = receive_timestamp();
+    let t2 = receive_timestamp("time.nist.gov");
 
     assert!(t2 > t1);
     assert_eq!(t2 - t1, 1);
