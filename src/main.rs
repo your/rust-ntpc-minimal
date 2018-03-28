@@ -41,12 +41,14 @@ const TRANSMIT_TS_OFFSET: u64 = 40;
 // where: LI = 0; VN, Mode = 3
 // altogether: 000011011 -> 1b (base 16)
 // padding the rest with zeros
-const REQUEST_PACKET: &'static str = "\x1b\x00\x00\x00\x00\x00\x00\x00\
-                                      \x00\x00\x00\x00\x00\x00\x00\x00\
-                                      \x00\x00\x00\x00\x00\x00\x00\x00\
-                                      \x00\x00\x00\x00\x00\x00\x00\x00\
-                                      \x00\x00\x00\x00\x00\x00\x00\x00\
-                                      \x00\x00\x00\x00\x00\x00\x00\x00";
+const REQUEST_HEADER: &'static [u8] = &[
+    0x1b, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+];
 
 // Unix epoch is 1970-01-01T00:00:00Z
 // NTP epoch is 1900-01-01T00:00:00Z
@@ -72,7 +74,7 @@ fn receive_timestamp() -> u32 {
     socket.set_write_timeout(socket_timeout).expect("set_write_timeout call failed");
     socket.set_read_timeout(socket_timeout).expect("set_read_timeout call failed");
 
-    socket.send_to(REQUEST_PACKET.as_bytes(), ntp_address).expect("couldn't send data");
+    socket.send_to(REQUEST_HEADER, ntp_address).expect("couldn't send data");
     socket.recv_from(&mut buffer).expect("didn't receive data");
 
     let mut reader = Cursor::new(&buffer);
